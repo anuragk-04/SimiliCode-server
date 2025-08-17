@@ -1,11 +1,11 @@
 import { PlagResult } from "../Types/PlagResultType";
 
 /**
- * Interface for plagiearism detector. 
- * Provides detect method which detects plagiarism fro two submissions.
+ * Interface for plagiarism detector.
+ * Provides detect method which detects plagiarism for two submissions.
  */
 interface IPlagDetector {
-   detect(): PlagResult;
+  detect(): PlagResult; // Returns a plagiarism result synchronously
 }
 
 export default IPlagDetector;

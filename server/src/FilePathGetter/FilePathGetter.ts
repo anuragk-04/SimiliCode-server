@@ -1,32 +1,34 @@
-import IFilePathGetter from "./IFilePathGetter"
-const fs = require("fs")
-var path = require("path")
+import IFilePathGetter from "./IFilePathGetter";
+import fs from "fs";
+import path from "path";
 
 /**
- * Class Implements IFilePathGetter interface. 
- * Takes in a directory and fetches all files in all nested directories.
+ * Class implements IFilePathGetter interface. 
+ * Takes a directory and fetches all .js files in nested directories.
  */
 class FilePathGetter implements IFilePathGetter {
 
-    // Method to get all file path in directory and sub directories
-    getFilePaths(directoryPath: string): Array<string> {
-        let arrayOfFiles: Array<string> = [];
-        return this.getDeepFilePaths(directoryPath, arrayOfFiles)
+    // Method to get all file paths in directory and subdirectories (synchronous)
+    getFilePaths(directoryPath: string): string[] {
+        const arrayOfFiles: string[] = [];
+        return this.getDeepFilePaths(directoryPath, arrayOfFiles);
     }
 
-    // helper method to get file paths
-    private getDeepFilePaths(directoryPath: string, arrayOfFiles: Array<string>): Array<string> {
-        let files = fs.readdirSync(directoryPath)
-        files.forEach((file: string) => {
-            if (fs.statSync(directoryPath + "/" + file).isDirectory()) {
-                arrayOfFiles = this.getDeepFilePaths(directoryPath + "/" + file, arrayOfFiles)
-            } else {
-                if (file.endsWith(".js")) {
-                    arrayOfFiles.push(path.join(directoryPath, "/", file))
-                }
+    // Helper method to recursively fetch .js files
+    private getDeepFilePaths(directoryPath: string, arrayOfFiles: string[]): string[] {
+        const files = fs.readdirSync(directoryPath, { withFileTypes: true });
+
+        for (const file of files) {
+            const fullPath = path.join(directoryPath, file.name);
+
+            if (file.isDirectory()) {
+                this.getDeepFilePaths(fullPath, arrayOfFiles);
+            } else if (file.isFile() && file.name.endsWith(".js")) {
+                arrayOfFiles.push(fullPath);
             }
-        })
-        return arrayOfFiles
+        }
+
+        return arrayOfFiles;
     }
 }
 

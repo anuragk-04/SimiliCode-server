@@ -1,46 +1,49 @@
-import IASTGenerator from "./IASTGenerator"
-import * as babel from "@babel/core"
-import { SubmissionCode, SubmissionMap } from "../Types/PlagResultType"
-const fs = require("fs")
+import IASTGenerator from "./IASTGenerator";
+import * as babel from "@babel/core";
+import { SubmissionCode, SubmissionMap } from "../Types/PlagResultType";
+import fs from "fs";
 
 /**
  * Class implements IASTGenerator.
- * Implements method that takes in path and generate all root nodes.
+ * Generates AST nodes from JavaScript files in given paths.
  */
 class ASTGenerator implements IASTGenerator {
-  private fileMap: SubmissionMap
-  private mapFileToContent: SubmissionCode
-  private filePaths: Array<string>
+  private fileMap: SubmissionMap = {};
+  private mapFileToContent: SubmissionCode = {};
+  private filePaths: string[];
 
-  constructor(filePaths: Array<string>) {
-    this.fileMap = {}
-    this.mapFileToContent = {}
-    this.filePaths = filePaths
+  constructor(filePaths: string[]) {
+    this.filePaths = filePaths;
   }
+
   // Method to generate all root nodes.
-  generateASTs(): Array<babel.Node> {
-    let nodes: Array<babel.Node> = []
-    let counter: number = 0
-    this.filePaths.forEach((path: string) => {
-      let newPath: string = path.split(/Submission\d{1}[/\\]{1,2}/)[1]
-      this.fileMap[counter] = newPath
-      nodes.push(babel.transformFileSync(path, { ast: true, code:false }).ast)
-      const content: string = fs.readFileSync(path, "utf-8")
-      this.mapFileToContent[newPath] = content
-      counter = counter + 1
-    })
-    return nodes
+  generateASTs(): babel.Node[] {
+    const nodes: babel.Node[] = [];
+
+    this.filePaths.forEach((filePath, index) => {
+      // Clean up path to store relative path for mapping
+      const newPath = filePath.split(/Submission\d{1}[\\/]{1,2}/)[1] || filePath;
+      this.fileMap[index] = newPath;
+
+      const ast = babel.transformFileSync(filePath, { ast: true, code: false })?.ast;
+      if (ast) nodes.push(ast);
+
+      const content = fs.readFileSync(filePath, "utf-8");
+      this.mapFileToContent[newPath] = content;
+    });
+
+    return nodes;
   }
 
   // Method to get the map of file to its content.
   getFileContents(): SubmissionCode {
-    return this.mapFileToContent
+    return this.mapFileToContent;
   }
 
   // Method to get map of index to the file path.
   getFileMaps(): SubmissionMap {
-    return this.fileMap
+    return this.fileMap;
   }
 }
 
-export default ASTGenerator
+export default ASTGenerator;

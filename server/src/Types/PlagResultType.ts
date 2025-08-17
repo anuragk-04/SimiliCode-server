@@ -1,29 +1,25 @@
-//Type for similarity lines object
+// Type for similarity lines object
 export type SimilarityLines = {
-	file: string
-	lines: Array<number>
-}
+  file: string;
+  lines: number[];
+};
 
-//Type for similarity submissions object
+// Type for similarity submissions object
 export type SimilaritySubmissions = {
-	submission1: SimilarityLines
-	submission2: SimilarityLines
-}
+  submission1: SimilarityLines;
+  submission2: SimilarityLines;
+};
 
-//Type for Plagiarism result object
+// Type for plagiarism result object
 export type PlagResult = {
-	submission1: SubmissionCode
-	submission2: SubmissionCode
-	score: number
-	[key: number]: SimilaritySubmissions
-}
+  submission1: SubmissionCode;
+  submission2: SubmissionCode;
+  score: number;
+  similarities: Record<number, SimilaritySubmissions>; // clearer separation
+};
 
-//Type for Submission content object
-export type SubmissionCode = {
-	[key: string]: string
-}
+// Type for submission content object
+export type SubmissionCode = Record<string, string>;
 
-//Type for submission file map object
-export type SubmissionMap = {
-	[key: number]: string
-}
+// Type for submission file map object
+export type SubmissionMap = Record<number, string>;
